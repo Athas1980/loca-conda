@@ -8,11 +8,10 @@ function _init()
 owchies = {54,54,55,55,56,56,57,57}
 c_owch = 1
 levels = {
-	{ d1 =20, d4=20, seeker=true},
+	{ d1 =5, d2=10,d10=3, seeker=true},
 	{
 		d1 = 10,
-		delay = 6,
-		seeker=true
+		delay = 6
 	},
 	{
 		d2 =10,
