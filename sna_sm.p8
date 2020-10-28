@@ -5,6 +5,7 @@ __lua__
 --wes
 
 function _init()
+
 owchies = {54,54,55,55,56,56,57,57}
 c_owch = 1
 levels = {
@@ -80,11 +81,133 @@ level = {}
 level.num = 4
 level.dia = 2
 p = make_player()
+state = "title"
+title = init_title()
 
-load_level(1)
+--load_level(1)
 end
 
 function _update()
+	if(state=="game") then update_game()
+	else update_title()
+	end
+end
+
+function update_title()
+	if(btnp(❎)) then
+		load_level(1)
+		state = "game"
+		return
+	end
+	if (title.delay > 0) then 
+		title.delay -=1
+		return
+	else 
+		title.delay = 1
+	end
+	local changes = {}
+	for snake in all(title.snakes) do
+		append_all(changes, snake:move(snake:next()))
+	end
+	for i=1, #changes do
+		local c = changes[i]
+		title.lmap[c[1].x][c[1].y] = c[2]
+	end
+end
+function init_title()
+	t = {
+		lmap={},
+		frame =0,
+		delay = 1,
+		snakes = {}
+	}
+	for x = 0, 25 do
+		t.lmap[x]={}
+		for y = 0, 25 do
+			t.lmap[x][y] = 0
+		end
+	end
+	local s = make_snake(1)
+	s.len= 7
+	s.head= coords(0,24)
+	s.hist={up}
+	s.drawn=2
+	s.tail= coords(0,25)
+	s.counter = 0
+	s.directions = {{up, 23}, {right,1}, {down,5}, {right, 2}}
+	s.next = function (self)
+		c = self.counter
+		self.counter = min(999, self.counter + 1)
+		printh(self.directions[1][2])
+		for dir in all(self.directions) do
+			if (c <= dir[2]) return dir[1]
+			c -= dir[2]
+		end
+		return nil
+
+	end
+
+	add(t.snakes, s)
+
+	local s = make_snake(0)
+	s.len= 12
+	s.enemy = false
+	s.head= coords(25,6)
+	s.hist={up}
+	s.drawn=2
+	s.tail= coords(25,7)
+	s.counter = 0
+	s.directions = {{left, 18}, {up, 1}, {left,1},{up,4},{right,2}, {down, 4}, {left,1}}
+	s.next = function (self)
+		c = self.counter
+		self.counter = min(999, self.counter + 1)
+		printh(self.directions[1][2])
+		for dir in all(self.directions) do
+			if (c <= dir[2]) return dir[1]
+			c -= dir[2]
+		end
+		return nil
+
+	end
+
+	add(t.snakes, s)
+
+
+
+	local s = make_snake(0)
+	s.len= 9
+	s.enemy = false
+	s.head= coords(0,3)
+	s.hist={up}
+	s.drawn=2
+	s.tail= coords(0,4)
+	s.counter = 0
+	s.directions = {{up, 2}, {right,9}, {down, 4},{right, 2},{down,1}, {left,3}, {up,4}, {right, 2}}
+	s.next = function (self)
+		c = self.counter
+		self.counter = min(999, self.counter + 1)
+		printh(self.directions[1][2])
+		for dir in all(self.directions) do
+			if (c <= dir[2]) return dir[1]
+			c -= dir[2]
+		end
+		return nil
+
+	end
+
+	add(t.snakes, s)
+
+
+
+	--music(1)
+	return t
+
+
+
+end
+
+
+function update_game()
 	local changed_cells ={}
 	player_dir()
 	if current_delay>0 then
@@ -175,24 +298,38 @@ end
 
 
 function _draw()
-	cls()
-	dmap()
-	c_owch = (c_owch + 1) % 8
-	msg(0,122,"score " .. p.score)
-	msg(56, 122, "lives " .. p.lives)
-	msg(96, 122, "level " .. level.num)
-	color(7)
-	
-	if p.dead then 
+	if (state =="title") draw_title()
+	if (state=="game") then
+		cls()
+		dmap()
+		c_owch = (c_owch + 1) % 8
+		msg(0,122,"score " .. p.score)
+		msg(56, 122, "lives " .. p.lives)
+		msg(96, 122, "level " .. level.num)
+		color(7)
+		
 		if p.dead then 
-			msg(40,64,"you have died")
-			msg(40,72, "press x to retry")
+			if p.dead then 
+				msg(40,64,"you have died")
+				msg(40,72, "press x to retry")
+				return
+			end
 			return
-		  end
-		return
+		end
 	end
 end
-
+function draw_title()
+	cls(5)
+	print ("This is the titlescreen that\n never ends")
+	for i = 0, 24 do
+		for j = 0, 25 do
+			-- print("x:"..i.." y:"..j.." lmap"..title.lmap[i][j])
+			local s = title.lmap[i][j]
+			sx, sy = (s % 16) * 8, (s \ 16) * 8
+			if (s!=0) sspr(sx,sy,5,5,i*5,j*5)
+		end
+	end
+end
 -->8
 -- display
 function msg(x, y, m)

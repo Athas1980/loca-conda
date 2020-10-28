@@ -9,7 +9,7 @@ function make_snake(n)
 	s.hist={down}
 	s.dir=down
 	s.num = n
-	if (n > 0) then
+	if (n > 0 and levels[level.num].es) then
 		s.len = levels[level.num].es[n]
 	else 
 		s.len=0
@@ -19,8 +19,9 @@ function make_snake(n)
     s.next = function(self)
         return self.head:plus(self.dir)
     end
-    s.move = function(self, dir)
+	s.move = function(self, dir)
 		local affected = {}
+		if (dir == nill) return affected
 		local old = self.hist[#self.hist]
 		self.dir = dir
         self.drawn += 1
