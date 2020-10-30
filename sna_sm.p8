@@ -138,7 +138,6 @@ function init_title()
 	s.next = function (self)
 		c = self.counter
 		self.counter = min(999, self.counter + 1)
-		printh(self.directions[1][2])
 		for dir in all(self.directions) do
 			if (c <= dir[2]) return dir[1]
 			c -= dir[2]
@@ -161,7 +160,6 @@ function init_title()
 	s.next = function (self)
 		c = self.counter
 		self.counter = min(999, self.counter + 1)
-		printh(self.directions[1][2])
 		for dir in all(self.directions) do
 			if (c <= dir[2]) return dir[1]
 			c -= dir[2]
@@ -216,7 +214,7 @@ function update_game()
 	end
 
 	append_all(changed_cells, enemy_snake_dir())
-	if (p.ctrl>0) p.ctrl = p.ctrl -1
+	if (p.ctrl>0) p.ctrl -= 1
 	current_delay = delay
 		
 
@@ -301,6 +299,7 @@ function _draw()
 	if (state =="title") draw_title()
 	if (state=="game") then
 		cls()
+		print(p.hist[#p.hist])
 		dmap()
 		c_owch = (c_owch + 1) % 8
 		msg(0,122,"score " .. p.score)
@@ -363,13 +362,14 @@ function player_dir()
 	end 
 	if (p.ctrl>0) return
 	p.old_dir = p.dir
-	if btn(⬆️) and p.dir!=down then
+	local prev = p.hist[#p.hist]
+	if btn(⬆️) and prev!=down then
 		p.dir=up
-	elseif btn(⬇️) and p.dir!=up then
+	elseif btn(⬇️) and prev!=up then
 		p.dir=down
-	elseif btn(⬅️) and p.dir!=right then
+	elseif btn(⬅️) and prev!=right then
 		p.dir=left
-	elseif btn(➡️) and p.dir!=left then
+	elseif btn(➡️) and prev!=left then
 		p.dir=right
 	end
 end
