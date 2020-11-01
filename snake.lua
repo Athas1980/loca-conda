@@ -92,6 +92,7 @@ function make_player()
 	p= reset_player(p)
 	p.score =0
 	p.lives =5
+	p.buff = {}
 	return p
 end
 
