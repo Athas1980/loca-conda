@@ -12,7 +12,8 @@ help={}
 levels = {
 	{
 		d1 = 10,
-		delay = 5
+		delay = 5,
+		ghost = true
 	},
 	{
 		d2 =10,
@@ -42,7 +43,8 @@ levels = {
 		s=2},
 	{
 		d10=20,
-		s=2
+		s=2,
+		ghost=true
 	},
 	{
 		d1=20,
@@ -64,6 +66,7 @@ levels = {
 }
 es = {}
 seeker=nil
+ghost=nil
 
 lwidth =25
 lheight =35
@@ -121,6 +124,7 @@ function update_title()
 		state="help"
 		init_help()
 	end
+	t.frame += 1
 	local changes = {}
 	for snake in all(title.snakes) do
 		append_all(changes, snake:move(snake:next()))
@@ -235,6 +239,14 @@ function update_game()
 			lmap[c[1].x][c[1].y] = c[2]
 		end
 	end
+
+	if ghost then
+		g = update_ghost()
+		for i=1, #g do
+			local c = g[i]
+			lmap[c[1].x][c[1].y] = c[2]
+		end
+	end
 	
 	
 	head = p:next()
@@ -270,6 +282,18 @@ function update_game()
 			return
 		else 
 			sfx(0)
+		end
+	end
+
+	if (new_cell == 12) then
+		p.ghosts_eaten += 1
+		p.len = p.len + 15
+		ghost.x = 21
+		ghost.y = 1
+		if p.ghosts_eaten == 3 then
+			sfx(11)
+			p.lives += 1
+			p.ghosts_eaten = 0
 		end
 	end
 
@@ -362,15 +386,25 @@ function draw_title()
 	palt(0,false)
 	palt(15,true)
 	
+	if (t.frame > 60) then 
+	if (t.frame < 64) then
+		pal(9,1)pal(10,1)pal(7,1)
+	else 
+		pal(9,9)pal(10,10)pal(7,7)
+	end
 	map(0,0,32,72,8*8,5*8)
+	end
+
 	palt(15,false)
 	palt(0,true)
+
+	print(t.frame, 0,0, 7)
 end
 
 function init_help()
 	pal()
 	help.miny = 0
-	help.maxy = 43
+	help.maxy = 165
 	help.y=0
 end
 
@@ -382,36 +416,38 @@ function draw_help()
 			spr(132,x*8,y*8,4,4)
 		end
 	end
-	msg(5,0, "how to play")
-	line(5,7,50,7,10)
+
+	local y = 3
+	msg(5,y, "how to play") y=y+7
+	line(5,y,50,y,10) y=y+3
 	
-	msg(5,10, "collect diamonds in the levels")
-	msg(5,17, "avoiding walls, your own tail,")
-	msg(5,24, "enemy snakes, saws,")
-	msg(5,31, "and seekers.")
+	msg(5,y, "collect diamonds in the levels") y=y+7
+	msg(5,y, "avoiding walls, your own tail,") y=y+7
+	msg(5,y, "enemy snakes, saws,") y=y+7
+	msg(5,y, "and seekers.") y=y+10
 
-	spr(116, 5,40)spr(117, 10,40)spr(118, 15,40)
-	msg(25,40, "enemy snake")
+	spr(116, 5,y)spr(117, 10,y)spr(118, 15,y)
+	msg(25,y, "enemy snake") y=y+7 
 
-	spr(54, 10,46)
-	msg(25, 46, "saw")
+	spr(54, 10,y) 
+	msg(25, y, "saw") y += 7
 
-	spr(7, 10, 52) msg(25,52,"seeker" )
+	spr(7, 10, y) msg(25,y,"seeker") y +=15
 
-	msg(5, 60, "bonuses.")
-	line(5,67,35,67,10)
+	msg(5, y, "bonuses") y+=7
+	line(5,y,32,y,10) y+=3
 
-	spr(52, 5, 71)
-	spr(53, 5, 78)
-	spr(12,5,85)
-	msg(20,71, "life only appears once")
-	msg(20,78, "shortens snake")
-	msg(20,85, "ghost collect 3 for a life")
+	spr(52, 5, y) msg(20,y, "life only appears once") y+=7
+	spr(53, 5, y) msg(20,y, "shortens snake") y+=7
+	spr(12,5,y) msg(20,y, "ghost collect 3 for a life") y+=15
+	
+	
+	
 
-	msg(5,93, "score table")
-	line(5,100,47,100,10)
+	msg(5,y, "score table") y+=7
+	line(5,y,47,y,10) y+=3
 
-	local i = 103
+	local i = y
 	line(5,i,100,i,5)
 	msg(22,i+1, "points")
 	msg(60,i+1, "length")
@@ -436,20 +472,37 @@ function draw_help()
 	i=i+9
 	line(6,i,100,i,5)
 
-	line (5,i,5,103,5)
+	line (5,i,5,y,5)
 	
-	line (100,i,100,103,5)
-	line (18,i,18,103,5)
-	line (55,i,55,103,5)
+	line (100,i,100,y,5)
+	line (18,i,18,y,5)
+	line (55,i,55,y,5)
+	y= i + 10
+
+	msg(5, y, "thanks and credits") y+=7
+	line(5,y,75,y,10) y+=3
+	spr(2, 2, y+2) msg(10,y, "level music by") y+=7
+	msg(10,y, "smellyfishstiks") y+=10
+	spr(3, 2, y+2) msg(10,y, "fraggle and duck for the") y+=7
+	msg(10,y, "origional amstrad game") y+=7
+	msg(10,y, "crazy snake") y+=10
+	spr(4, 2, y+2) msg(10,y, "everyone on the pico8") y+=7
+	msg(10,y, "discord for all their help") y+=7
+	msg(10,y, "and support") y+=15
+
+	print("❎ to return to title",16,y,8)
+
+
 	
 	if (help.y > help.miny) then 
 		camera(0)
 		pal(5,13)
 		palt(15,true)
-		for i=0, 15 do
-			spr(197,i*8,0,1,1,false,true)
-		end
+		-- for i=0, 15 do
+		-- 	spr(197,i*8,0,1,1,false,true)
+		-- end
 		pal()
+		spr(196,120,0)
 			
 		
 	end
@@ -458,16 +511,13 @@ function draw_help()
 		pal(5,13)
 		palt(0,false)
 		palt(15,true)
-		for i=0, 15 do
-			spr(197,i*8,120,1,1,false,false)
-		end
-		pal()
+		-- for i=0, 15 do
+		-- 	spr(197,i*8,120,1,1,false,false)
+		-- end
 		
+		pal()
+		spr(196,120,120,1,1,false,true)
 	end
-
-	
-
-
 
 end
 -->8
@@ -588,6 +638,27 @@ function update_seeker()
 	return changes
 end
 
+function update_ghost() 
+	local changes = {}
+	local x = ghost.x
+	local y = ghost.y
+	add(changes, {coords(x, y), 0})
+
+
+	local available_directions ={0, up, down, left, right, up, down, left, right}
+	local new_dir = available_directions[flr(rnd(#available_directions)) + 1]
+	if (new_dir == 0 ) return {}
+	local newcoord = coords(x, y):plus(new_dir)
+	if (lmap[newcoord.x][newcoord.y] != 0) return {}
+
+	ghost.x = newcoord.x
+	ghost.y = newcoord.y
+	add(changes, {newcoord, 12})
+	printh(#changes)
+	return changes
+
+end
+
 -->8
 --Reset
 
@@ -670,6 +741,14 @@ function load_level(n, reloaded)
 		seeker.dy = 1
 	else
 		seeker = nil
+	end
+
+	if(lvl.ghost) then
+		ghost ={}
+		ghost.x = 21
+		ghost.y = 1
+	else
+		ghost = nil
 	end
 
 	if (lvl.delay) delay=lvl.delay else delay = 3
@@ -832,14 +911,14 @@ dd1011dddd1011ddd1001dddd10011dd000000000000000100000000000000000000000000000000
 10111011110110110001011110011111100000000000010000010000000000000000000000000000000000000000000000000000000000000000000000000000
 101d110000111100011110000011dd66100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 101dd6111011111101dd1111011dddd6100000000000010000010000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000eeee200006d000000007700000000000ff5fff5f0000000006660000030300000003000000000000000000000ccc0000006677000000000000000000
-00000000e888200066dd0000007a940000000000ffffffff000000006777400003330330033303300000000000000000ccccc000066666700000000000000000
-00700700e8882000dd11000007aaa940000000005fff5fff000000006788600000333b130033bb130000000000000000cacac000d60660670000000000000000
-00077000e88820000d1000007aaaaa9400000000ff5fff5f000000006780600033b11b5103bb1b510000000000000000ccccc000d666666d0000000000000000
-000770002222200000000000777a944400000000f5f5f5f500000000046600000b5101100b51b1100000000000000000c0c0c000dd8e8e860000000000000000
-007007000000000000000000007a9400000000005f5f5f5f0000000000000000031b130003111300000000000000000000000000d8e8e8660000000000000000
-000000000000000000000000007a9400000000005555555500000000000000000030b1300030b1300000000000000000000000000ddd66600000000000000000
-000000000000000000000000007a940000000000555555550000000000000000000313000003130000000000000000000000000000dddd000000000000000000
+00000000eeee200006d000000007700000777700ff5fff5f0000000006660000030300000003000000000000000000000ccc0000006677000000000000000000
+00000000e888200066dd0000007a940007a99a70ffffffff000000006777400003330330033303300000000000000000ccccc000066666700000000000000000
+00700700e8882000dd11000007aaa9407a9009a95fff5fff000000006788600000333b130033bb130000000000000000cacac000d60660670000000000000000
+00077000e88820000d1000007aaaaa9479000099ff5fff5f000000006780600033b11b5103bb1b510000000000000000ccccc000d666666d0000000000000000
+000770002222200000000000777a944470000009f5f5f5f500000000046600000b5101100b51b1100000000000000000c0c0c000dd8e8e860000000000000000
+007007000000000000000000007a9400777777795f5f5f5f0000000000000000031b130003111300000000000000000000000000d8e8e8660000000000000000
+000000000000000000000000007a940009aaaa905555555500000000000000000030b1300030b1300000000000000000000000000ddd66600000000000000000
+000000000000000000000000007a940000999900555555550000000000000000000313000003130000000000000000000000000000dddd000000000000000000
 0000000000000000000000000000000000000000f5f5f5f500000000000000000000000000000000ff777fff000000000000000000000000777aaaff00000000
 67600000070000006700000000000000000000005f5f5f5f00000000006000006760000067700000f7aaaaff9aa000009aa00000aa000000f7aff9ffaaa00000
 707000006700000070700000000000000000000055f555f5000000000070000070700000707000007affaaafa0a00000a0000000a0a00000f7afffffa0000000

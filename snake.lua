@@ -93,6 +93,7 @@ function make_player()
 	p.score =0
 	p.lives =5
 	p.buff = {}
+	p.ghosts_eaten =0
 	return p
 end
 
