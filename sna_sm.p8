@@ -9,6 +9,7 @@ function _init()
 owchies = {54,54,55,55,56,56,57,57}
 c_owch = 1
 help={}
+input= {}
 levels = {
 	{
 		d1 = 10,
@@ -258,6 +259,13 @@ function update_game()
 	if current_delay>0 then
 		current_delay -= 1
 		return
+	end 
+	if (#input == 1) then
+		p.dir = input[1]
+		input = {}
+	elseif (#input > 1) then
+		p.dir = input[#input -1]
+		input = {input[#input]}
 	end
 
 	if (death_timer >0) then
@@ -598,16 +606,20 @@ function player_dir()
 		load_level(1)
 	end 
 	if (p.ctrl>0) return
-	p.old_dir = p.dir
-	local prev = p.hist[#p.hist]
+	local prev
+		if #input >0 then
+			prev=input[#input]
+		else 
+			prev = p.hist[#p.hist]
+		end
 	if btnp(⬆️) and prev!=down then
-		p.dir=up
+		add(input, up)
 	elseif btnp(⬇️) and prev!=up then
-		p.dir=down
+		add(input, down)
 	elseif btnp(⬅️) and prev!=right then
-		p.dir=left
+		add(input,left)
 	elseif btnp(➡️) and prev!=left then
-		p.dir=right
+		add(input,right)
 	end
 end
 
@@ -696,7 +708,6 @@ function update_ghost()
 	ghost.x = newcoord.x
 	ghost.y = newcoord.y
 	add(changes, {newcoord, 12})
-	printh(#changes)
 	return changes
 
 end
