@@ -13,7 +13,6 @@ levels = {
 	{
 		d1 = 10,
 		delay = 5,
-		ghost = true
 	},
 	{
 		d2 =10,
@@ -28,6 +27,7 @@ levels = {
 		delay = 4,
 	},
 	{
+		owch=2,
 		d2 = 30,
 		d10 = 2,
 		l=2
@@ -46,16 +46,36 @@ levels = {
 		s=2,
 		ghost=true
 	},
+	
 	{
 		d1=20,
 		d10=5,
-		delay=2,
-		l=2},
+		delay=3,
+		es={15,10},
+		l=1},
 	{
 		d4 =5,
 		d1= 10,
-		es={20, 6, 6, 10}
+		es={20, 10},
+		owch = 5
 	},
+
+	{
+		d4 =20,
+		d1= 10,
+		d10=2,
+		s=1,
+		es={4,4},
+		owch = 10
+	},
+	{
+		ghost= true,
+		owch = 10,
+		d4 = 10,
+		l=2,
+		s=4
+	},
+
 	{
 		d1 =5,
 		d2=5,
@@ -63,6 +83,31 @@ levels = {
 		seeker=true,
 		delay=5
 	},
+	{
+		d1 = 10,
+		delay = 1
+	},
+	{
+		d5 =10,
+		d10=2,
+		s=1,
+		es={4,4},
+		owch = 10
+	},
+	{ 
+		d1 = 10,
+		l = 3,
+		ghost = true,
+		s=1},
+		{
+			d2 =5,
+			d5=5,
+			d10=1,
+			seeker=true,
+			delay=3
+		},
+
+
 }
 es = {}
 seeker=nil
@@ -321,7 +366,6 @@ function dmap()
 			local spr = lmap[i][j]
 			if (spr==nill) then
 				spr=0
-				printh ("Error nil cell at "..i..","..j)
 			end
 			if (spr==owchies[1]) spr= owchies[c_owch + 1]
 			sx, sy = (spr % 16) * 8, (spr \ 16) * 8
@@ -377,7 +421,6 @@ function draw_title()
 	
 	for i = 0, 24 do
 		for j = 0, 25 do
-			-- print("x:"..i.." y:"..j.." lmap"..title.lmap[i][j])
 			local s = title.lmap[i][j]
 			sx, sy = (s % 16) * 8, (s \ 16) * 8
 			if (s!=0) sspr(sx,sy,5,5,i*5,j*5)
@@ -398,7 +441,6 @@ function draw_title()
 	palt(15,false)
 	palt(0,true)
 
-	print(t.frame, 0,0, 7)
 end
 
 function init_help()
